@@ -1,7 +1,7 @@
 module.exports = {
-  HOST: "ep-lucky-bonus-axtaj6xd-pooler.c-4.us-east-2.aws.neon.tech",
+  HOST: "ep-divine-sun-axye8jyd-pooler.c-4.us-east-2.aws.neon.tech",
   USER: "neondb_owner",
-  PASSWORD: "npg_HS2EZ8iIznlF",
+  PASSWORD: "npg_tMDdYcJ4s9RO",
   DB: "neondb",
   dialect: "postgres",
   pool: {

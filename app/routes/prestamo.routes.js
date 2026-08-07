@@ -1,19 +1,19 @@
 module.exports = app => {
+
     const prestamos = require("../controllers/prestamo.controller.js");
     var router = require("express").Router();
-    // Create a new Client
+
+    // Crear préstamo
     router.post("/create/", prestamos.create);
-    // Retrieve all Client
+
+    // Obtener todos
     router.get("/", prestamos.findAll);
-    // Retrieve all published Client
-    router.get("/status", prestamos.findAllStatus);
-    // Retrieve a single Client with id
+
+    // Obtener uno por id
     router.get("/:id", prestamos.findOne);
-    // Update a Client with id
+
+    // Actualizar devolución
     router.put("/update/:id", prestamos.update);
 
-
-    // Podemos utilizar como una ocpion app.use("EndPoint",router" para simplicar el URI
-    // Ej.  http://localhost:Puerto/api/cliente/
     app.use("/api/prestamos", router);
 };

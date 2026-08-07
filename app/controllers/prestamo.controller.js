@@ -10,7 +10,6 @@ exports.create = async (req, res) => {
 
     try {
 
-        // Buscar libro
         const libro = await Libro.findByPk(req.body.libroId);
 
         if (!libro) {
@@ -20,7 +19,6 @@ exports.create = async (req, res) => {
         }
 
 
-        // Verificar disponibilidad
         if (!libro.disponible) {
             return res.status(400).send({
                 message: "El libro no está disponible"
@@ -28,7 +26,6 @@ exports.create = async (req, res) => {
         }
 
 
-        // Buscar estudiante
         const estudiante = await Estudiante.findByPk(req.body.estudianteId);
 
         if (!estudiante) {
@@ -38,19 +35,17 @@ exports.create = async (req, res) => {
         }
 
 
-        // Crear préstamo
         const prestamo = await Prestamo.create({
 
             libroId: req.body.libroId,
 
             estudianteId: req.body.estudianteId,
 
-            fechaPrestamo: new Date()
+            Fecha_Pre: new Date()
 
         });
 
 
-        // Cambiar estado del libro
         libro.disponible = false;
 
         await libro.save();
@@ -62,14 +57,13 @@ exports.create = async (req, res) => {
     } catch(error){
 
         res.status(500).send({
-
             message: error.message
-
         });
 
     }
 
 };
+
 
 
 
@@ -82,10 +76,10 @@ exports.findAll = async (req,res)=>{
 
             include:[
                 {
-                    model:Libro
+                    model: Libro
                 },
                 {
-                    model:Estudiante
+                    model: Estudiante
                 }
             ]
 
@@ -104,6 +98,7 @@ exports.findAll = async (req,res)=>{
     }
 
 };
+
 
 
 
@@ -126,9 +121,7 @@ exports.findOne = async(req,res)=>{
         if(!prestamo){
 
             return res.status(404).send({
-
                 message:"Préstamo no encontrado"
-
             });
 
         }
@@ -140,14 +133,13 @@ exports.findOne = async(req,res)=>{
     }catch(error){
 
         res.status(500).send({
-
             message:error.message
-
         });
 
     }
 
 };
+
 
 
 
@@ -162,31 +154,23 @@ exports.update = async(req,res)=>{
         if(!prestamo){
 
             return res.status(404).send({
-
                 message:"Préstamo no encontrado"
-
             });
 
         }
 
 
-        // Registrar fecha devolución
-        prestamo.fechaDevolucion = new Date();
-
+        // Guardar fecha de devolución
+        prestamo.Fecha_Dev = new Date();
 
         await prestamo.save();
 
 
 
-        // Volver disponible el libro
-
-        const libro = await Libro.findByPk(
-            prestamo.libroId
-        );
+        const libro = await Libro.findByPk(prestamo.libroId);
 
 
         libro.disponible = true;
-
 
         await libro.save();
 
@@ -201,18 +185,16 @@ exports.update = async(req,res)=>{
         });
 
 
-
     }catch(error){
 
         res.status(500).send({
-
             message:error.message
-
         });
 
     }
 
 };
+
 
 
 
@@ -227,9 +209,7 @@ exports.delete = async(req,res)=>{
         if(!prestamo){
 
             return res.status(404).send({
-
                 message:"Préstamo no encontrado"
-
             });
 
         }
@@ -239,18 +219,14 @@ exports.delete = async(req,res)=>{
 
 
         res.send({
-
-            message:"Préstamo eliminado"
-
+            message:"Préstamo eliminado correctamente"
         });
 
 
     }catch(error){
 
         res.status(500).send({
-
             message:error.message
-
         });
 
     }

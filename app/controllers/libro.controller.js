@@ -2,43 +2,47 @@ const db = require("../models");
 const Libro = db.libro;
 const Op = db.Sequelize.Op;
 
-// Create and Save a new Client
+// Crear un libro
 exports.create = (req, res) => {
-    // Validamos que dentro del  request no venga vacio el nombre, de lo contrario returna error
-    if (!req.body.nombre) {
+
+    if (!req.body.titulo) {
         res.status(400).send({
             message: "Content can not be empty!"
         });
         return;
     }
 
-    // Create a Client, definiendo una variable con la estructura del reques para luego solo ser enviada como parametro mas adelante. 
     const libro = {
         titulo: req.body.titulo,
         autor: req.body.autor,
-        publicacion: req.body.publicacion, 
+        publicacion: req.body.publicacion,
         genero: req.body.genero,
-        // utilizando ? nos ayuda a indicar que el paramatro puede ser opcional dado que si no viene, le podemos asignar un valor default
-        disponible: req.body.status ? req.body.status : false
+        disponible: req.body.disponible ?? true
     };
 
-    // Save a new Client into the database
     Libro.create(libro)
         .then(data => {
             res.send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message:
-                    err.message || "Some error occurred while creating the Client."
+                message: err.message || "Some error occurred while creating the book."
             });
         });
 };
 
-// Retrieve all Client from the database.
+// Obtener todos los libros
 exports.findAll = (req, res) => {
-    const nombre = req.query.nombre;
-    var condition = nombre ? { nombre: { [Op.iLike]: `%${nombre}%` } } : null;
+
+    const titulo = req.query.titulo;
+
+    const condition = titulo
+        ? {
+            titulo: {
+                [Op.iLike]: `%${titulo}%`
+            }
+        }
+        : null;
 
     Libro.findAll({ where: condition })
         .then(data => {
@@ -46,104 +50,122 @@ exports.findAll = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message:
-                    err.message || "Some error occurred while retrieving clients."
+                message: err.message || "Some error occurred while retrieving books."
             });
         });
 };
 
-// Find a single Tutorial with an id
+// Obtener un libro por ID
 exports.findOne = (req, res) => {
+
     const id = req.params.id;
 
     Libro.findByPk(id)
         .then(data => {
-            res.send(data);
+            if (data) {
+                res.send(data);
+            } else {
+                res.status(404).send({
+                    message: `Libro con id=${id} no encontrado.`
+                });
+            }
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error retrieving Cliente with id=" + id
+                message: "Error retrieving Libro with id=" + id
             });
         });
 };
 
-// Update a Tutorial by the id in the request
+// Actualizar un libro
 exports.update = (req, res) => {
+
     const id = req.params.id;
 
     Libro.update(req.body, {
         where: { id: id }
     })
         .then(num => {
-            if (num == 1) {
+
+            if (num == 1 || num[0] == 1) {
                 res.send({
-                    message: "Cliente was updated successfully."
+                    message: "Libro actualizado correctamente."
                 });
             } else {
                 res.send({
-                    message: `Cannot update Client with id=${id}. Maybe Client was not found or req.body is empty!`
+                    message: `Cannot update Libro with id=${id}. Maybe Libro was not found or req.body is empty!`
                 });
             }
+
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating Client with id=" + id
+                message: "Error updating Libro with id=" + id
             });
         });
 };
 
-// Delete a Client with the specified id in the request
+// Eliminar un libro
 exports.delete = (req, res) => {
+
     const id = req.params.id;
-    // utilizamos el metodo destroy para eliminar el objeto mandamos la condicionante where id = parametro que recibimos 
+
     Libro.destroy({
         where: { id: id }
     })
         .then(num => {
+
             if (num == 1) {
                 res.send({
-                    message: "Client was deleted successfully!"
+                    message: "Libro eliminado correctamente."
                 });
             } else {
                 res.send({
-                    message: `Cannot delete Client with id=${id}. El cliente no fue encontado!`
+                    message: `Cannot delete Libro with id=${id}. El libro no fue encontrado.`
                 });
             }
+
         })
         .catch(err => {
             res.status(500).send({
-                message: "Could not delete Tutorial with id=" + id
+                message: "Could not delete Libro with id=" + id
             });
         });
 };
 
-// Delete all Clients from the database.
+// Eliminar todos los libros
 exports.deleteAll = (req, res) => {
+
     Libro.destroy({
         where: {},
         truncate: false
     })
         .then(nums => {
-            res.send({ message: `${nums} Clients were deleted successfully!` });
+            res.send({
+                message: `${nums} Libros fueron eliminados correctamente.`
+            });
         })
         .catch(err => {
             res.status(500).send({
-                message:
-                    err.message || "Some error occurred while removing all clients."
+                message: err.message || "Some error occurred while removing all books."
             });
         });
 };
 
-// find all active Client, basado en el atributo status vamos a buscar que solo los clientes activos
+// Obtener todos los libros disponibles
 exports.findAllStatus = (req, res) => {
-    Libro.findAll({ where: { status: true } })
+
+    Libro.findAll({
+        where: {
+            disponible: true
+        }
+    })
         .then(data => {
             res.send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message:
-                    err.message || "Some error occurred while retrieving Client."
+                message: err.message || "Some error occurred while retrieving books."
             });
-        }); 
+        });
 };
